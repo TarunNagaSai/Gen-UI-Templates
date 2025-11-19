@@ -1,14 +1,33 @@
-# Travel Gen AI
+# Edutech Gen UI
 
-An AI-powered travel planning application built with Flutter, Firebase Gemini AI, and the GenUI framework.
+An AI-powered interactive learning application built with Flutter, Firebase Gemini AI, and the GenUI framework. This app transforms education into an engaging, conversational experience with integrated YouTube videos, AI-generated summaries, and interactive quizzes.
 
-## Features
+## App Concept
 
-- 🤖 AI-powered conversational travel recommendations
-- 🎨 Dynamic UI generation using GenUI framework
-- 💬 Real-time streaming responses
-- 📱 Cross-platform support (Android & iOS)
-- 💾 Local chat history persistence
+Edutech Gen UI is designed to provide a comprehensive learning experience through AI-powered conversations:
+
+### 📚 Learning Flow
+
+1. **Ask & Learn**: Users ask questions about any topic they want to understand
+2. **AI Explanation**: The AI provides detailed explanations with relevant YouTube video recommendations
+3. **Embedded Video Player**: Watch educational videos directly within the chat interface
+4. **Smart Summaries**: Click the summary button below any video to get an AI-generated quick summary
+5. **Interactive Quizzes**: After learning, take AI-generated quizzes (up to 5 questions) based on the content
+6. **Progress Tracking**: Save quiz results and learning progress locally
+7. **Notes Management**: Summaries are automatically saved as notes for future reference
+8. **Persistent Chat History**: All conversations are stored locally for easy review
+
+### ✨ Key Features
+
+- 🤖 **AI-Powered Learning**: Conversational explanations using Google Gemini API
+- 🎥 **Embedded YouTube Player**: Watch educational videos without leaving the app
+- 📝 **Auto-Generated Summaries**: Quick AI summaries of video content
+- 🎯 **Dynamic Quizzes**: AI-generated quizzes based on learned content
+- 📊 **Progress Tracking**: Save and review quiz results
+- 💾 **Local Storage**: Chat history, notes, and quiz results saved locally
+- 🎨 **Dynamic UI Generation**: GenUI framework for flexible, AI-driven interfaces
+- 📱 **Cross-platform**: Works on Android & iOS
+- ⚡ **Real-time Streaming**: Live AI responses as they're generated
 
 ## Prerequisites
 

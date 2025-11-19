@@ -1,10 +1,23 @@
-# Travel Gen AI
+# Flutter Gen_UI Templates
 
-An AI-powered travel planning application built with Flutter, Firebase Gemini AI, and the GenUI framework.
+A collection of Flutter template applications showcasing the GenUI framework with various AI integrations.
 
-## Features
+## About Gen_UI
 
-- 🤖 AI-powered conversational travel recommendations
+This repository contains Flutter templates that demonstrate the power of dynamic UI generation using the GenUI framework with different AI backends including:
+- `genui` - Core GenUI framework
+- `genui_firebase_ai` - Firebase Gemini AI integration
+- `genui_google_generative_ai` - Google Generative AI integration
+- `genui_a2ui` - A2UI integration
+
+## Available Templates
+
+### 🎓 [Edutech Gen UI](./Edutech_gen_ui)
+
+An AI-powered educational/travel planning application built with Flutter, Firebase Gemini AI, and the GenUI framework.
+
+**Features:**
+- 🤖 AI-powered conversational recommendations
 - 🎨 Dynamic UI generation using GenUI framework
 - 💬 Real-time streaming responses
 - 📱 Cross-platform support (Android & iOS)
