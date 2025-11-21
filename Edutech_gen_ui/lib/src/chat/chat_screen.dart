@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:education_gen_ui/src/catalogs/catalogs.dart';
 import 'package:education_gen_ui/src/const/education_system_prompt.dart';
+import 'package:education_gen_ui/src/tools/youtube_search_key_tool.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:genui/genui.dart';
@@ -38,14 +39,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ),
       ),
     );
+
     final FirebaseAiContentGenerator generator = FirebaseAiContentGenerator(
       catalog: catalog,
       systemInstruction: educationSystemPrompt,
+      additionalTools: [YoutubeSearchKeyTool()],
     );
 
     _uiConversation = GenUiConversation(
       genUiManager: genUiManager,
       contentGenerator: generator,
+
       onSurfaceUpdated: (update) {
         _scrollToBottom();
       },
