@@ -9,14 +9,9 @@ final _schema = S.object(
     ),
     'options': S.list(
       description: 'A list of options for the user to choose from.',
-      items: S.object(
-        properties: {
-          'value': A2uiSchemas.stringReference(
-            description:
-                'An option that the user can select as an answer to the question.',
-          ),
-        },
-        required: ['value'],
+      items: A2uiSchemas.stringReference(
+        description:
+            'An option that the user can select as an answer to the question.',
       ),
     ),
   },
@@ -26,11 +21,19 @@ final _schema = S.object(
 final quizCardWidgetCatalogItem = CatalogItem(
   name: 'QuizCardWidget',
   widgetBuilder: (itemContext) {
-    final data = itemContext.data as Map<String, String>;
+    final data = itemContext.data as Map<String, Object?>;
 
-    final question = data["question"] as String;
-    final options = data["options"] as List<String>;
-    return QuizCardWidget(question: question, options: options);
+    final question =
+        (data["question"] as Map<String, dynamic>)["literalString"] as String;
+    final options = data["options"] as List<dynamic>;
+
+    final listOfOptions = options.map((e) {
+      return e["literalString"] as String;
+    });
+    return QuizCardWidget(
+      question: question,
+      options: List.from(listOfOptions),
+    );
   },
   dataSchema: _schema,
   exampleData: [_example1, _example2],
@@ -83,9 +86,12 @@ class _QuizCardWidgetState extends State<QuizCardWidget> {
             ),
             const SizedBox(height: 8),
 
-            FilledButton(
-              onPressed: _selectedOption == null ? null : () {},
-              child: Text("Submit Answer"),
+            Align(
+              alignment: .centerRight,
+              child: FilledButton(
+                onPressed: _selectedOption == null ? null : () {},
+                child: Text("Submit"),
+              ),
             ),
           ],
         ),
@@ -98,10 +104,10 @@ String _example1() => '''
 {
   "question": "What is the capital of France?",
   "options": [
-    {"value": "Berlin"},
-    {"value": "Madrid"},
-    {"value": "Paris"},
-    {"value": "Rome"}
+     "Berlin",
+     "Madrid",
+     "Paris",
+     "Rome"
   ]
 }
 ''';
@@ -110,10 +116,10 @@ String _example2() => '''
 {
   "question": "Which planet is known as the Red Planet?",
   "options": [
-    {"value": "Earth"},
-    {"value": "Mars"},
-    {"value": "Jupiter"},
-    {"value": "Saturn"}
+    "Earth",
+    "Mars",
+    "Jupiter",
+    "Saturn"
   ]
 }
 ''';

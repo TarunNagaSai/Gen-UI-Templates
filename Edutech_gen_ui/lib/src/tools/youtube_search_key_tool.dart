@@ -3,7 +3,6 @@ import 'package:genui/genui.dart';
 import 'package:json_schema_builder/json_schema_builder.dart';
 
 /// This is a AI tool to search YouTube videos based on a search key.
-/// Basic MCP tool implementation
 class YoutubeSearchKeyTool extends AiTool<Map<String, Object?>> {
   YoutubeSearchKeyTool({required this.listOfVideos})
     : super(
@@ -26,7 +25,7 @@ class YoutubeSearchKeyTool extends AiTool<Map<String, Object?>> {
   Future<Map<String, Object?>> invoke(JsonMap args) async {
     final String searchKey = args['searchKey'] as String;
 
-    /// Send the result to the youtube card
+    /// Send the result to the youtuben cardxplain
     return (await listOfVideos(searchKey)).toJson();
   }
 }

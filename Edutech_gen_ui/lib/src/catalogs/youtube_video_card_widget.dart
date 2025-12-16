@@ -5,8 +5,9 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 final _schema = S.object(
   properties: {
-    'videoId': S.string(
-      description: 'The YouTube video ID to display in the card.',
+    'videoUrl': S.string(
+      description: 'The YouTube video url to display in the card.',
+      pattern: "https://www.youtube.com/watch?v={videoId}",
     ),
     'action': S.object(
       description: 'The action to perform when the item is tapped.',
@@ -21,15 +22,11 @@ final _schema = S.object(
               description:
                   'A prompt to guide the analysis of the YouTube video.',
             ),
-            'youtubeVideo': S.string(
-              description:
-                  'The URL of the YouTube video in the format "https://www.youtube.com/watch?v={videoId}".',
-            ),
           },
-          required: ['analysisPrompt', 'youtubeVideo'],
+          required: ['analysisPrompt'],
         ),
       },
-      required: ['name'],
+      required: ['name, context'],
     ),
   },
   required: ['videoId', 'action'],
@@ -38,10 +35,10 @@ final _schema = S.object(
 final youtubeCardWidgetCatalog = CatalogItem(
   name: 'YoutubeVideoCardWidget',
   widgetBuilder: (itemContext) {
-    final data = itemContext.data as Map<String, String>;
+    final data = itemContext.data as Map<String, Object?>;
 
     final videoId = data["videoId"] as String;
-    final action = data["action"] as Map<String, String>;
+    final action = data["action"] as Map<String, dynamic>;
 
     return YouTubeVideoCardWidget(
       videoId: videoId,
@@ -98,6 +95,30 @@ class _YouTubeVideoCardWidgetState extends State<YouTubeVideoCardWidget> {
     super.dispose();
   }
 
+  // button press action to start analyzing the video
+  void onVideoAnalyze() {
+    /// Dispatch the action with context
+    final List<Object?> contextDefinition = [
+      (widget.action['context'] as Map<String, dynamic>),
+    ];
+    final String actionName = widget.action['name'] as String;
+
+    /// Resolve the context
+    final JsonMap resolvedContext = resolveContext(
+      widget.dataContext,
+      contextDefinition,
+    );
+
+    /// Dispatch the event
+    widget.dispatchEvent(
+      UserActionEvent(
+        name: actionName,
+        sourceComponentId: widget.widgetId,
+        context: resolvedContext,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -118,28 +139,7 @@ class _YouTubeVideoCardWidgetState extends State<YouTubeVideoCardWidget> {
               alignment: Alignment.bottomRight,
               child: TextButton.icon(
                 icon: Icon(Icons.auto_awesome),
-                onPressed: () {
-                  /// Dispatch the action with context
-                  final List<Object?> contextDefinition =
-                      (widget.action['context'] as List<Object?>?) ??
-                      <Object?>[];
-                  final String actionName = widget.action['name'] as String;
-
-                  /// Resolve the context
-                  final JsonMap resolvedContext = resolveContext(
-                    widget.dataContext,
-                    contextDefinition,
-                  );
-
-                  /// Dispatch the event
-                  widget.dispatchEvent(
-                    UserActionEvent(
-                      name: actionName,
-                      sourceComponentId: widget.widgetId,
-                      context: resolvedContext,
-                    ),
-                  );
-                },
+                onPressed: onVideoAnalyze,
                 label: Text("Analyze"),
               ),
             ),

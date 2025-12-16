@@ -1,9 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:education_gen_ui/src/catalogs/catalogs.dart';
+import 'package:education_gen_ui/src/chat/widgets/chat_empty_state.dart';
 import 'package:education_gen_ui/src/chat/widgets/conversations.dart';
 import 'package:education_gen_ui/src/const/education_system_prompt.dart';
 import 'package:education_gen_ui/src/services/youtube_service.dart';
 import 'package:education_gen_ui/src/tools/youtube_search_key_tool.dart';
+import 'package:education_gen_ui/src/utils/loggin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:genui/genui.dart';
@@ -23,15 +25,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  final List<String> surfaceIds = <String>[];
-  // AI Model
+  final surfaceIds = <String>[];
+
+  /// AI conversation instance
   late final GenUiConversation _uiConversation;
+  late final GenUiManager genUiManager;
 
   @override
   void initState() {
-    final Catalog catalog = CoreCatalogItems.asCatalog();
-    final genUiManager = GenUiManager(
-      catalog: travelAppCatalog,
+    /// Initialize GenUiManager and Content Generator
+    genUiManager = GenUiManager(
+      catalog: eduAppCatalog,
       configuration: const GenUiConfiguration(
         actions: ActionsConfig(
           allowCreate: true,
@@ -40,33 +44,81 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ),
       ),
     );
+    genUiManager.dataModels;
 
+    /// genui_firebase_ai content generator
     final FirebaseAiContentGenerator generator = FirebaseAiContentGenerator(
-      catalog: catalog,
+      catalog: eduAppCatalog,
       systemInstruction: educationSystemPrompt,
       additionalTools: [
         YoutubeSearchKeyTool(listOfVideos: YouTubeService().searchVideos),
       ],
     );
 
+    generator.inputTokenUsage;
+    generator.outputTokenUsage;
+
+    /// Initialize GenUiConversation with [genUiManager] and [generator]
+    /// Set up callbacks to handle updates and scrolling
+    /// to bottom on new messages
     _uiConversation = GenUiConversation(
       genUiManager: genUiManager,
       contentGenerator: generator,
-      onSurfaceUpdated: (update) {
-        _scrollToBottom();
-      },
-      onSurfaceAdded: (update) {
-        _scrollToBottom();
-      },
-      onTextResponse: (text) {
-        if (!mounted) return;
-        if (text.isNotEmpty) {
-          _scrollToBottom();
-        }
-      },
+      onSurfaceAdded: surfaceAdded,
+      onSurfaceUpdated: surfaceUpdated,
+      onSurfaceDeleted: surfaceRemoved,
+      onTextResponse: onTextResponse,
+      onError: onError,
     );
-
     super.initState();
+  }
+
+  /// Actions to be performed when new UI is added to chat.
+  void surfaceAdded(SurfaceAdded surfaceAdded) {
+    surfaceIds.add(surfaceAdded.surfaceId); // "youtube_video_display"
+    final context = surfaceAdded.definition.asContextDescriptionText(); //
+    logging.info(
+      context,
+    ); // "A user interface is shown..........'Start Quiz!'}}}}}}."
+    final value = genUiManager.getSurfaceNotifier(surfaceAdded.surfaceId).value;
+
+    logging.info(value);
+
+    _scrollToBottom(); // scroll to the bottom of the chat
+  }
+
+  /// Actions to be performed when surface is updated
+  void surfaceUpdated(SurfaceUpdated surfaceUpdated) {
+    /// Check if surface id is prest
+    if (!surfaceIds.contains(surfaceUpdated.surfaceId)) {
+      surfaceIds.add(surfaceUpdated.surfaceId);
+    }
+    final value = genUiManager
+        .getSurfaceNotifier(surfaceUpdated.surfaceId)
+        .value;
+
+    logging.info(value);
+
+    _scrollToBottom(); //scroll the chat to bottom of the chat
+  }
+
+  void surfaceRemoved(SurfaceRemoved surfacedRemoved) {
+    surfaceIds.remove(
+      surfacedRemoved.surfaceId,
+    ); // When widget is removed from the chat.
+  }
+
+  // If AI responded with a text based response.
+  void onTextResponse(String text) {
+    if (!mounted) return;
+    if (text.isNotEmpty) {
+      _scrollToBottom();
+    }
+  }
+
+  // if a error is generated in the ai response
+  void onError(ContentGeneratorError onError) {
+    // record this error in firebase crashlytics
   }
 
   @override
@@ -123,6 +175,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     child: ValueListenableBuilder<List<ChatMessage>>(
                       valueListenable: _uiConversation.conversation,
                       builder: (context, messages, child) {
+                        if (messages.isEmpty) {
+                          return ChatEmptyState(
+                            onSendMessage: _handleSendMessage,
+                          );
+                        }
                         return Conversation(
                           messages: messages,
                           manager: _uiConversation.genUiManager,
@@ -131,10 +188,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       },
                     ),
                   ),
-                  ChatMessageInput(
-                    controller: _messageController,
-                    onSendMessage: _handleSendMessage,
-                    isLoading: chatState.isLoading,
+
+                  ValueListenableBuilder(
+                    valueListenable: _uiConversation.isProcessing,
+                    builder: (context, value, child) {
+                      return ChatMessageInput(
+                        controller: _messageController,
+                        onSendMessage: _handleSendMessage,
+                        isLoading: _uiConversation.isProcessing.value,
+                      );
+                    },
                   ),
                 ],
               );
@@ -158,14 +221,3 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 }
-
-
-
-/// Give me some examples to ask AI tutor
-/// 
-/// - Explain the concept of photosynthesis with examples.
-/// - How does the water cycle work? Provide real-life examples.
-/// - Can you give me examples of Newton's three laws of motion?/// - What are some examples of chemical reactions in everyday life?
-/// - Explain the concept of supply and demand with examples.
-/// - How do ecosystems function? Provide examples of different ecosystems.
-/// - Can you give me examples of different types of clouds and their characteristics?

@@ -10,7 +10,7 @@ import 'package:genui/genui.dart';
 /// for a travel planning experience, such as [travelCarousel], [itinerary],
 /// and [inputGroup]. The AI selects from these components to build a dynamic
 /// and interactive UI in response to user prompts.
-final Catalog travelAppCatalog = CoreCatalogItems.asCatalog()
+final Catalog eduAppCatalog = CoreCatalogItems.asCatalog()
     .copyWithout([
       CoreCatalogItems.audioPlayer,
       CoreCatalogItems.card,

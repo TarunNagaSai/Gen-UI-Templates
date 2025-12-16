@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:education_gen_ui/src/providers/ai_provider.dart';
 import 'package:education_gen_ui/src/chat/widgets/chat_suggestion_chip.dart';
 
 class ChatSuggestionChips extends ConsumerWidget {
-  const ChatSuggestionChips({super.key});
+  const ChatSuggestionChips({super.key, required this.onSendMessage});
+
+  final void Function(String) onSendMessage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -14,19 +15,19 @@ class ChatSuggestionChips extends ConsumerWidget {
       alignment: WrapAlignment.center,
       children: [
         ChatSuggestionChip(
-          label: 'Plan a 7-day trip to Rome',
-          icon: Icons.flight_takeoff,
-          onTap: (label) => ref.read(aiChatProvider.notifier).sendMessage(label),
+          label: 'What is photosynthesis?',
+          icon: Icons.grass,
+          onTap: (label) => onSendMessage(label),
         ),
         ChatSuggestionChip(
-          label: 'Budget hotels in Paris',
-          icon: Icons.hotel,
-          onTap: (label) => ref.read(aiChatProvider.notifier).sendMessage(label),
+          label: 'Explain how mountains are formed',
+          icon: Icons.terrain,
+          onTap: (label) => onSendMessage(label),
         ),
         ChatSuggestionChip(
-          label: 'Kid-friendly activities',
-          icon: Icons.family_restroom,
-          onTap: (label) => ref.read(aiChatProvider.notifier).sendMessage(label),
+          label: 'How did Alexander the great conquer the world?',
+          icon: Icons.history_edu,
+          onTap: (label) => onSendMessage(label),
         ),
       ],
     );

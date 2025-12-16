@@ -45,10 +45,14 @@ class ChatMessageInput extends StatelessWidget {
                   horizontal: 20,
                   vertical: 12,
                 ),
-                suffixIcon: IconButton(
-                  onPressed: isLoading ? null : () => onSendMessage(controller.text),
-                  icon: const Icon(Icons.send),
-                ),
+                suffixIcon: isLoading
+                    ? Icon(Icons.hourglass_top)
+                    : IconButton(
+                        onPressed: isLoading
+                            ? null
+                            : () => onSendMessage(controller.text),
+                        icon: const Icon(Icons.send),
+                      ),
               ),
               onSubmitted: isLoading ? null : onSendMessage,
               textInputAction: TextInputAction.send,
